@@ -72,7 +72,8 @@ def gcd_euclid_ext(a, b):
         return (d, x, y)
 	
 
-#1.3 LCM computation:
+#2 LCM Computing:
+#2.1
 #  The following function computes the least common multiple of two integers
 #  using the gcd operationi as subroutine
 #
@@ -87,3 +88,20 @@ def lcm(a, b):
     
 
 
+
+#3 Solving modular linear equations
+#  The following function solves the equation  ax = b(mod n), and returns all 
+#  solutions to this equation
+#
+def mle_solver(a, b, n):
+    s = []
+    d, x, y = gcd_euclid_ext(a, n)
+    if b % d == 0:
+        s0 = (x * ( b / d)) % n
+        order = n/d
+        tmp  = s0
+        while d != 0:
+            s.append((tmp % n))
+            tmp = tmp + order
+            d = d - 1
+    return s
