@@ -164,6 +164,27 @@ def sim_cong_solver(n, a):
   
 
     
-
-
+#5 Modular Exponentiation
+#  The following function would compute the modular exponentiation (a^b % n)
+#  efficiently by the method of repeated squaring 
 #
+def modular_exp(a, b, n):
+    """
+    :param a : base, a nonnegative integer
+    :param b : exponent, a nonnegative integer
+    :param n : modulo, a postive integer
+    """
+    if a < 0 or b < 0 or n <= 0:
+        return -1
+    b_str = bin(b)[2:]
+    d = 1
+    for i in b_str:
+        d = (d*d) % n
+        if i == '1':
+            d = (d * a) % n
+    return d
+
+
+
+
+
