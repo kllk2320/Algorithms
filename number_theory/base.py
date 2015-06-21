@@ -1,6 +1,11 @@
 # Just for self-study
 from numpy import *
 from math import sqrt
+from random import randint
+import logging
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 #1 GCD computing
 #
@@ -186,5 +191,79 @@ def modular_exp(a, b, n):
 
 
 
+#6 Primality testing
+#a. Important theorems related to primality testing
+#a.1 Prime number theorem
+#  The number of primes that are less than or equal to n approximates to n/ln(n) as n grows to infinite
+#a.2 If p is an odd prime, and e >= 1, then the equation x^2 = 1 (mod p^e) has only two solutions, x = 1
+#     or x = -1.
+#    If there exists a nontrivial square root of 1, modulo n, then n is composite.
+#
 
+#6.1 Pseudoprimality testing
+def pseudoprime(a, n):
+    """
+    This function tests whether n is composite or base-a pseudo prime. If it returns
+    False, then n is definitely composite. If it returns True, then n is base-a pseudo
+    prime, which is very likely prime. 
+    So it gives a very simple method for primality testing that "almost works" 
+    and in fact is good enough for many pratical applicaton. 
 
+    a: a base number, normally 2 is chosen
+    n: an odd integer greater than 2
+    return : False, n is not prime (definitely)
+             True,  n is prime (most likely)
+    """
+    if a < 2 or n < 2 or n & 1 == 0:
+        return False
+    if modular_exp(a, n-1, n) != 1 :
+        return False    # n is definitley a composite number
+    else :
+        return True    # n is most likely a prime number 
+    
+#6.2 Miller-Rabin primality testing
+# An improved version of pseudoprime testing with 2 modifications:
+#  a. It tries several randomly chosen base values a instead of just one base value
+#  b. While computing each modular exponentiation, it looks for a nontrival square 
+#     square root of 1, modulo n, during the final set of squarings. If it finds one,
+#     it stops and returns composite. 
+
+# First, we need an auxiliary procedure called 'witness' such that 'witness(a, n)' 
+# is TRUE if and only if a is a "witness" to the compositeness of n, that is if it
+# is possible using a to prove that n is composite.
+def witness(a, n):
+    if a < 2 or n < 2 or n & 1 == 0:
+        return True
+    u = n-1
+    t = 0
+    while u & 1 == 0:
+        u = u >> 1
+        t = t + 1
+    x0 = modular_exp(a, u, n)
+    logger.debug("[FUNC: %s] u = %d, t = %d", __name__, u, t)
+    #print "u=%d t= %d" % (u, that)
+    while t:
+        #print x0
+        x1 = (x0 * x0) % n
+        if x1 == 1 and x0 != 1 and x0 != n - 1:
+            return True
+        x0 = x1
+        t = t - 1
+    if x1 != 1:
+        return True
+    return False
+    
+#
+def miller_rabin(n, s):
+    if n < 2 or n & 1 == 0:
+        return False
+    if s < 1:
+        print "ERROR: s must be positive integer"
+        return False
+    while s:
+        a = randint(1, n-1)
+        if witness(a, n) == True:
+            #print a
+            return False
+        s = s -1
+    return True
